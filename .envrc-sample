@@ -1,0 +1,3 @@
+# A full PostgreSQL URL of the form:
+#   postgres://user:password@host:port/dbname
+DATABASE_URL=
