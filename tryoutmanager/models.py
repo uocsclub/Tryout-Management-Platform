@@ -101,8 +101,9 @@ class Submission(Base):
     challenge_id = Column(UUID, ForeignKey('challenges.id'), nullable=False)
     reservation = relationship('Reservation')
     status = Column(
-            Enum('open', 'closed', name='submission_status'), default='closed',
-            nullable=False)
+            Enum('in_progress', 'late', 'submitted',
+                 name='submission_status'),
+            default='closed', nullable=False)
 
     # A contestant may only have one submission per challenge
     __table_args__ = (
@@ -123,6 +124,9 @@ class Reservation(Base):
     closes_at = Column(DateTime(timezone=True), nullable=False)
     cancelled = Column(Boolean, default=False, nullable=False)
     cancelled_at = Column(DateTime(timezone=True), nullable=True)
+    status = Column(
+            Enum('open', 'closed', 'cancelled', name='reservation_status'),
+            default='closed', nullable=False)
     created_at = Column(
             DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 
