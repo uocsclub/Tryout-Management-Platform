@@ -37,6 +37,8 @@ class AdminUser(Base):
 
     email = Column(String, nullable=False, unique=True, primary_key=True)
     password = Column(String, nullable=False)
+    github_slug = Column(String, nullable=True)
+    public_keys = relationship('PublicKey', back_populates='user')
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
 
@@ -49,6 +51,8 @@ class Marker(Base):
     challenges = relationship(
             'Challenges', secondary=markers_challenges,
             back_populates='markers')
+    github_slug = Column(String, nullable=True)
+    public_keys = relationship('PublicKey', back_populates='user')
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
 
@@ -59,9 +63,17 @@ class User(Base):
     password = Column(String, nullable=False)
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    github_slug = Column(String, nullable=True)
+    public_keys = relationship('PublicKey', back_populates='user')
     confirmed = Column(Boolean, nullable=False, default=False)
     email_confirmation_slug = Column(String, unique=True)
     email_confirmation_expiry = Column(DateTime(timezone=True))
+
+
+class PublicKey(Base):
+    __tablename__ = 'public_keys'
+
+    key = Column(String, nullable=False, primary_key=True)
 
 
 class Challenge(Base):
