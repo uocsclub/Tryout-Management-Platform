@@ -19,23 +19,16 @@ Session = sessionmaker(bind=db)
 
 
 # Association tables for many-to-many relationships
-markers_challenges = Table('markers_challenges',
-                           Base.metadata,
-                           Column('marker_email',
-                                  String,
-                                  ForeignKey('markers.email')),
-                           Column('challenge_id',
-                                  UUID,
-                                  ForeignKey('challenges.id')))
+markers_challenges = Table(
+        'markers_challenges', Base.metadata, Column(
+            'marker_email', String, ForeignKey('markers.email')),
+        Column('challenge_id', UUID, ForeignKey('challenges.id')))
 
-challenges_submissions = Table('challenges_submissions',
-                               Base.metadata,
-                               Column('challenge_id',
-                                      UUID,
-                                      ForeignKey('challenges.id')),
-                               Column('submission_id',
-                                      UUID,
-                                      ForeignKey('submissions.id')))
+challenges_submissions = Table(
+        'challenges_submissions', Base.metadata, Column(
+                                   'challenge_id', UUID,
+                                   ForeignKey('challenges.id')),
+        Column('submission_id', UUID, ForeignKey('submissions.id')))
 
 
 # Tables corresponding to concrete models
@@ -53,9 +46,9 @@ class Marker(Base):
     email = Column(String, nullable=False, unique=True, primary_key=True)
     password = Column(String, nullable=False)
     name = Column(String, nullable=False)
-    challenges = relationship('Challenges',
-                              secondary=markers_challenges,
-                              back_populates='markers')
+    challenges = relationship(
+            'Challenges', secondary=markers_challenges,
+            back_populates='markers')
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
 
@@ -76,12 +69,12 @@ class Challenge(Base):
 
     id = Column(UUID, default=uuid.uuid4, primary_key=True)
     name = Column(String, nullable=False, unique=True)
-    markers = relationship('Markers',
-                           secondary=markers_challenges,
-                           back_populates='challenges')
-    submissions = relationship('Submission',
-                               secondary=challenges_submissions,
-                               back_populates='submissions')
+    markers = relationship(
+            'Markers', secondary=markers_challenges,
+            back_populates='challenges')
+    submissions = relationship(
+            'Submission', secondary=challenges_submissions,
+            back_populates='submissions')
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
 
@@ -90,26 +83,20 @@ class Submission(Base):
 
     id = Column(UUID, default=uuid.uuid4, primary_key=True)
     contestant = relationship('User', back_populates='submissions')
-    contestant_email = Column(String,
-                              ForeignKey('users.email'),
-                              nullable=False)
+    contestant_email = Column(
+            String, ForeignKey('users.email'), nullable=False)
     challenge = relationship('Challenge', back_populates='submissions')
-    challenge_id = Column(UUID,
-                          ForeignKey('challenges.id'),
-                          nullable=False)
+    challenge_id = Column(UUID, ForeignKey('challenges.id'), nullable=False)
     reservation = relationship('Reservation')
-    status = Column(Enum('open',
-                         'closed',
-                         name='submission_status'),
-                    default='closed',
-                    nullable=False)
+    status = Column(
+            Enum('open', 'closed', name='submission_status'), default='closed',
+            nullable=False)
 
     # A contestant may only have one submission per challenge
     __table_args__ = (
-                Index('index_submissions_on_contestant_and_challenge',
-                      'contestant_email',
-                      'challenge_id',
-                      unique=True),
+                Index(
+                    'index_submissions_on_contestant_and_challenge',
+                    'contestant_email', 'challenge_id', unique=True),
             )
 
 
@@ -117,22 +104,15 @@ class Reservation(Base):
     __tablename__ = 'reservations'
 
     id = Column(UUID, default=uuid.uuid4, primary_key=True)
-    submission = relationship('Submission',
-                              back_populates='reservation',
-                              uselist=False)
-    submission_id = Column(UUID,
-                           ForeignKey('submissions.id'),
-                           nullable=False)
-    starts_at = Column(DateTime(timezone=True),
-                       nullable=False)
-    closes_at = Column(DateTime(timezone=True),
-                       nullable=False)
+    submission = relationship(
+            'Submission', back_populates='reservation', uselist=False)
+    submission_id = Column(UUID, ForeignKey('submissions.id'), nullable=False)
+    starts_at = Column(DateTime(timezone=True), nullable=False)
+    closes_at = Column(DateTime(timezone=True), nullable=False)
     cancelled = Column(Boolean, default=False, nullable=False)
-    cancelled_at = Column(DateTime(timezone=True),
-                          nullable=True)
-    created_at = Column(DateTime(timezone=True),
-                        nullable=False,
-                        default=datetime.utcnow)
+    cancelled_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(
+            DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 
 
 if __name__ == '__main__':
